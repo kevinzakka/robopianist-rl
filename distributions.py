@@ -31,9 +31,13 @@ class Normal(nn.Module):
     def __call__(self, inputs, *args, **kwargs) -> distrax.Distribution:
         x = self.base_cls()(inputs, *args, **kwargs)
 
-        means = nn.Dense(self.action_dim, kernel_init=default_init())(x)
+        means = nn.Dense(
+            self.action_dim, kernel_init=default_init(), name="OutputDenseMean"
+        )(x)
         if self.state_dependent_std:
-            log_stds = nn.Dense(self.action_dim, kernel_init=default_init())(x)
+            log_stds = nn.Dense(
+                self.action_dim, kernel_init=default_init(), name="OutputDenseLogStd"
+            )(x)
         else:
             log_stds = self.param(
                 "OutpuLogStd", nn.initializers.zeros, (self.action_dim,), jnp.float32
